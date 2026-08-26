@@ -16,7 +16,7 @@ jobs:
     name: Pre-commit hook self-test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Configure a throwaway git identity
         # scripts/setup.sh's RED check does one real `git commit` that's expected to be
         # BLOCKED by the hook before git ever needs an author identity — but if the hook
@@ -33,7 +33,7 @@ jobs:
     name: Syntax checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: "18"
@@ -55,7 +55,7 @@ jobs:
     # be a mechanism and not a convention.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Check every skill declares the LEARNED.md preflight
         run: bash scripts/check-preflight.sh
 
@@ -63,7 +63,7 @@ jobs:
     name: Generator regression tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: "18"
