@@ -1,21 +1,54 @@
 # Confidentiality — read this before you type anything real into `profile/`
 
-This tool is designed so the repository can be public while your data never is. That only
-works if you follow the rules below — the tooling enforces what it mechanically can, and
-names what it can't.
+## The one thing to understand before anything else
+
+Every message you send in a Claude Code or Codex session — including your résumé, your
+comp history, your target companies, and anything else in `profile/`, `pipeline/`, or
+`roles/` — goes to that assistant's own servers (Anthropic's, for Claude; OpenAI's, for
+Codex) to generate a response. That's true of **any** AI-assistant conversation, with or
+without this tool. **job-search-os doesn't add extra transmission, and it can't remove the
+transmission that's already inherent to using an AI assistant.**
+
+What retention and training that data is subject to depends on your own account type and
+settings, not on this tool — check directly, don't take this document's word for it:
+- Claude Code: [code.claude.com/docs/en/data-usage](https://code.claude.com/docs/en/data-usage)
+- ChatGPT / Codex: [How your data is used to improve model performance](https://help.openai.com/en/articles/5722486-how-your-data-is-used-to-improve-model-performance)
+
+**What this tool actually controls is narrower and mechanical**: keeping your data out of
+git history, off GitHub, and away from any other tool sharing your session. That's real and
+it's enforced (see below) — it's just a different, more honest promise than "your data
+never leaves your machine," which is what this document and `SECURITY.md` used to say
+before an external audit caught the overclaim (see `docs/ADRs/JOBS-ADR-004` D1).
+
+### Web research is its own disclosed data flow
+
+`/evaluate-role` and `/sweep` use the AI assistant's own web-search/fetch capability to
+research a company. The queries they generate — built from the company name and role
+title — leave your machine to fulfill that search, separately from the conversation
+itself. Keep personal specifics (your comp target, your current employer, your own name)
+out of any research query you type or approve, for the same reason you keep them out of
+`profile/` commits: it's one more channel data can leave through.
+
+This tool is designed so the repository can be public while your data never enters git
+history or GitHub. That only works if you follow the rules below — the tooling enforces
+what it mechanically can, and names what it can't.
 
 ## What the tooling enforces for you
-- **`profile/*.md` (except `*.template.md`) is gitignored and refused by a pre-commit
-  hook**, even if you `git add -f` it. See `hooks/pre-commit`.
-- **The hook also scans every staged diff** for currency ranges, phone numbers, personal
-  email addresses, and LinkedIn URLs, and blocks the commit if any appear outside a
-  template file.
-- **`roles/active/` and `roles/passed/`** (your real pipeline of companies and verdicts)
-  are gitignored the same way.
+- **Every directory this tool writes real user data into is gitignored and categorically
+  refused by a pre-commit hook**, even if you `git add -f` it — currently `profile/*.md`,
+  `pipeline/*.md` (both except `*.template.md`), `roles/active/*.md`, `roles/passed/*.md`,
+  and everything under `applications/`. The rule is structural (what's gitignored here is
+  what the hook blocks), not a hand-maintained list to keep in sync — see `hooks/pre-commit`.
+- **The hook also scans the full staged content of every text file** for currency ranges,
+  phone numbers, personal email addresses, and LinkedIn URLs, and blocks the commit if any
+  appear outside a template file. It also categorically refuses staged `.docx`/`.pdf` and
+  common image formats outside `docs/` — a screenshot of an offer letter carries real
+  content a text scrub can't see.
 
 Run `scripts/setup.sh` before you do anything else — it installs this hook (git does not
-install it for you on clone) and proves it actually blocks a seeded unsafe commit before
-declaring itself done. **If setup hasn't run, nothing in this repo is protected.**
+install it for you on clone), confirms git will actually dispatch it (not just that the
+file's logic is correct), and proves it blocks a seeded unsafe commit before declaring
+itself done. **If setup hasn't run, nothing in this repo is protected.**
 
 ## What you have to enforce yourself — no git mechanism can see these
 1. **GitHub issues.** If you paste content from `profile/` into a public issue on this

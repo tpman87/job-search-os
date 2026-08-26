@@ -82,6 +82,12 @@ function main() {
     console.error("Source file not found: " + srcPath);
     process.exit(1);
   }
+  if (path.extname(srcPath).toLowerCase() !== ".md") {
+    console.error("Refusing to run: source must be a .md file, got " + srcPath + ".");
+    console.error("(A non-.md source has no .docx-derived output path, which previously");
+    console.error(" caused the output to silently overwrite the source file itself.)");
+    process.exit(1);
+  }
 
   const repoRoot = findRepoRoot(path.dirname(srcPath));
   const identity = readIdentity(repoRoot);
@@ -94,10 +100,19 @@ function main() {
     ...body,
   ]);
 
-  const outPath = path.resolve(outArg || srcPath.replace(/\.md$/, ".docx"));
+  const outPath = path.resolve(outArg || srcPath.replace(/\.md$/i, ".docx"));
+  if (outPath === srcPath) {
+    console.error("Refusing to run: output path resolved to the same file as the source (" +
+      outPath + "). Pass an explicit output path as the second argument.");
+    process.exit(1);
+  }
 
   Packer.toBuffer(doc).then((buf) => {
-    fs.writeFileSync(outPath, buf);
+    // Write atomically: a crash or interrupted write must never leave a truncated or
+    // half-written .docx in place of a previous good one.
+    const tmpPath = outPath + ".tmp-" + process.pid;
+    fs.writeFileSync(tmpPath, buf);
+    fs.renameSync(tmpPath, outPath);
     console.log("Wrote " + outPath);
   }).catch((err) => {
     console.error("Failed to render document: " + err.message);

@@ -5,10 +5,15 @@ Renders a resume or cover-letter source markdown file (see `docs/METHOD.md` and 
 
 ## Setup
 
+Requires Node.js 18 or later.
+
 ```bash
 cd generators
-npm install
+npm ci
 ```
+
+(`npm ci` installs exactly what's pinned in `package-lock.json` — use `npm install` only if
+you're deliberately updating a dependency version.)
 
 This installs into `generators/node_modules` only — **no global install, ever.** The
 original tool this repo was built from resolved its `docx` dependency via a global npm
@@ -19,12 +24,15 @@ self-contained.
 ## Usage
 
 ```bash
-node generate-resume.js ../career/tailored/some-role.md
-node generate-cover-letter.js ../career/cover-letters/some-role.md
+node generate-resume.js ../applications/some-company-role/resume.md
+node generate-cover-letter.js ../applications/some-company-role/letter.md
 ```
 
 Each writes a `.docx` alongside the source file by default, or to an explicit path if you
-pass a second argument.
+pass a second argument. See `applications/README.md` for the `<role-id>` directory naming
+rule. The source must be a `.md` file, and the output path must differ from the source —
+both are refused outright rather than silently overwriting the source with binary `.docx`
+bytes (a real defect in an earlier version of this tool, JOBS-ADR-004 D4).
 
 ## If `npm install` fails
 
@@ -45,8 +53,10 @@ producing a polished `.docx` automatically, not a requirement for the tool to fu
 - **The `.md` source files are the source of truth.** The `.docx` output is generated and
   disposable — edit the source, regenerate, never hand-edit the `.docx` output directly, or
   your edits will be silently lost the next time it's regenerated.
-- **Embedded document metadata**: before this pipeline is trusted for anything you'll send
-  externally, generate one sample document and inspect its `core.xml` for a `creator` or
-  `lastModifiedBy` field that might leak information about whoever's machine built it. See
-  the note in the repo's `docs/ADRs/` history (JOBS-ADR-003 Finding 9 / D8) — this was an
-  open question when the pipeline was built and should be checked on your own machine.
+- **Embedded document metadata — checked, closed (JOBS-ADR-004 D15).** `core.xml`'s
+  `dc:creator`/`cp:lastModifiedBy` fields are a static `"Un-named"` from the `docx` library
+  itself, not your OS username or any local path — verified by inspecting a generated
+  document's `core.xml` directly, and asserted on every CI run
+  (`generators/test/run-tests.js`) so a future `docx` version change that starts leaking
+  real machine info would fail the build rather than ship silently. This was an open
+  question in JOBS-ADR-003 Finding 9 / D8; it's resolved.

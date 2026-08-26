@@ -83,5 +83,9 @@ done, even if this step found nothing.
 
 ## Step 8 — save and report
 
-Save the draft, and tell the user plainly which claims came from where — this makes the
-letter auditable by them, not just by the tooling.
+Save the source as `applications/<role-id>/letter.md` — see `applications/README.md` for
+the `<role-id>` naming rule (roughly `<company>-<role-slug>[-<req-id>]`); reuse the same
+`<role-id>` directory `/tailor` used for this role. If `generators/` is set up, also run
+`node generate-cover-letter.js` from inside `applications/<role-id>/` to produce
+`letter.docx` alongside it. Tell the user plainly which claims came from where — this
+makes the letter auditable by them, not just by the tooling.

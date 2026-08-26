@@ -1,71 +1,167 @@
 #!/usr/bin/env bash
-# job-search-os pre-commit scrub gate
-# Per JOBS-ADR-003 D1a/D1b/D6/D10a. Runs on every commit in every user's instance —
-# this is the mechanism that keeps `profile/` (real comp figures, employer names, search
-# status) out of a repo that may later be pushed to a public remote.
+# job-search-os pre-commit scrub gate — v2
+# Per JOBS-ADR-003 D1a/D1b/D6/D10a and JOBS-ADR-004 D2. Runs on every commit in every
+# user's instance — this is the mechanism that keeps profile/pipeline/roles/applications
+# data (real comp figures, employer names, search status, generated packets) out of a
+# repo that may later be pushed to a public remote.
 #
 # This is a CHECK, not a convention. Rev 1 of the design proposed "define constraints once"
 # as an unenforced norm — that exact pattern already failed in the source workspace this
-# tool was built from (location rules and comp floor both drifted across multiple files
-# despite an ADR saying "single source of truth"). D6 requires a check; this is it.
+# tool was built from. D6 requires a check; this is it.
+#
+# v2 closes four gaps a QC round found in v1:
+#   1. Case-sensitive path matching (Profile/notes.MD bypassed the categorical block on a
+#      case-insensitive filesystem) — fixed with `shopt -s nocasematch`.
+#   2. `--diff-filter=ACM` silently dropped rename-detected files from inspection — fixed
+#      with `--no-renames`, which forces every rename to show as a plain add, so the new
+#      content is always evaluated.
+#   3. Binary/image files (a screenshot of an offer letter) were invisible to the text-diff
+#      scrub and not categorically blocked — fixed with an extension list plus a generic
+#      `git diff --numstat` binary check as a catch-all.
+#   4. Scrub-hit output printed the actual matched line into the terminal/session log —
+#      fixed: only file:line + pattern category are ever printed, never the match itself.
 #
 # Installed by scripts/setup.sh (git does not track .git/hooks, so this file is the source
 # of truth and setup.sh copies it into place — see D1a).
+#
+# CONTRACT: every diagnostic line below that blocks a commit contains the literal string
+# "BLOCKED". scripts/setup.sh's self-test and .github/workflows/ci.yml both grep for this
+# exact string to confirm the hook actually fired (not just that a commit failed for some
+# unrelated reason). If you reword these lines, keep "BLOCKED" in every one, or update both
+# consumers in the same commit.
 
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
-FAIL=0
-STAGED=$(git diff --cached --name-only --diff-filter=ACM)
+# nocasematch makes every `case` pattern below case-insensitive, so `Profile/x.MD` and
+# `profile/x.md` are treated identically — required on case-insensitive filesystems (the
+# macOS default) where two paths that "look different" to bash can be the same inode.
+shopt -s nocasematch
 
-# ---- D1b: categorical refusal — profile/*.md (real data) is NEVER staged, ----
-# ---- even via `git add -f`. Only *.template.md files may be committed.    ----
-for f in $STAGED; do
+FAIL=0
+
+# NUL-safe, rename-proof staged file list. `--no-renames` forces a rename to appear as a
+# plain delete+add rather than an `R` entry, so the new path/content is always inspected —
+# a bare `--diff-filter=ACM` would silently skip a file moved INTO a protected path via a
+# detected rename.
+STAGED_FILES=()
+while IFS= read -r -d '' f; do
+  STAGED_FILES+=("$f")
+done < <(git diff --cached --name-only -z --no-renames --diff-filter=ACM)
+
+# ---- Categorical refusal: paths that are NEVER staged, even via `git add -f`. ----
+for f in "${STAGED_FILES[@]}"; do
   case "$f" in
+    profile/*.template.md) : ;; # allowed — this is the shipped template, not real data
     profile/*.md)
-      case "$f" in
-        profile/*.template.md) : ;; # allowed — this is the shipped template, not real data
-        *)
-          echo "🔴 BLOCKED: $f matches profile/*.md and is not a .template.md file."
-          echo "   profile/ holds real user data (comp, employer names, search status) and"
-          echo "   must never be committed. If this is genuinely a new template file, name"
-          echo "   it *.template.md."
-          FAIL=1
-          ;;
-      esac
+      echo "🔴 BLOCKED: $f matches profile/*.md and is not a .template.md file."
+      echo "   profile/ holds real user data (comp, employer names, search status) and"
+      echo "   must never be committed. If this is genuinely a new template file, name"
+      echo "   it *.template.md."
+      FAIL=1
+      ;;
+    pipeline/*.template.md) : ;; # allowed — shipped template
+    pipeline/*.md)
+      echo "🔴 BLOCKED: $f matches pipeline/*.md and is not a .template.md file."
+      echo "   pipeline/ holds real user data (backlog, sourcing log, learned corrections)"
+      echo "   and must never be committed. If this is genuinely a new template file, name"
+      echo "   it *.template.md."
+      FAIL=1
       ;;
     roles/active/*.md|roles/passed/*.md)
       echo "🔴 BLOCKED: $f — roles/active and roles/passed hold real evaluation data and are"
       echo "   never committed to this repo."
       FAIL=1
       ;;
+    applications/README.md) : ;; # allowed — shipped documentation of the convention, no user data
+    applications/*)
+      echo "🔴 BLOCKED: $f — applications/ holds generated packets (tailored resumes,"
+      echo "   cover letters, QC reports) built from real user data and is never committed."
+      FAIL=1
+      ;;
   esac
 done
 
-# ---- D15/D10a scrub list: currency figures, common comp-band shapes, and a few ----
-# ---- structural fingerprints. Mechanical and intentionally broad — false        ----
-# ---- positives cost a re-commit; false negatives cost a public disclosure.      ----
-if [ -n "$STAGED" ]; then
-  HITS=$(git diff --cached -U0 -- $STAGED 2>/dev/null | grep -E '^\+' | grep -vE '^\+\+\+' | grep -inE \
-    -e '\$[0-9]{2,3}(,[0-9]{3})?[Kk]?[ -]?[-–—][ -]?\$?[0-9]{2,3}(,[0-9]{3})?[Kk]?' \
-    -e '\$[0-9]{3},[0-9]{3}' \
-    -e '[0-9]{3}-[0-9]{3}-[0-9]{4}' \
-    -e '[a-zA-Z0-9._%+-]+@(gmail|yahoo|hotmail|outlook|icloud)\.com' \
-    -e 'linkedin\.com/in/[a-zA-Z0-9-]+' \
-    || true)
-  if [ -n "$HITS" ]; then
-    echo "🔴 BLOCKED: staged content matches the scrub list (currency range, phone, personal"
-    echo "   email, or LinkedIn URL). This repo ships zero personal values — see JOBS-ADR-003 D1."
-    echo
-    echo "$HITS" | head -20
-    echo
-    echo "   If this is a false positive (e.g. a documentation example), rewrite it to use an"
-    echo "   obviously fake placeholder (\$XXX,XXX, name@example.com) instead."
+# ---- Categorical refusal: binary/generated-document extensions outside docs/. ----
+# docs/ is the one place a shipped binary asset (a demo screenshot, a reference PDF) is
+# allowed to live — everywhere else, a .docx/.pdf/.png/etc. is either a generated artifact
+# or a screenshot of something that shouldn't be public.
+for f in "${STAGED_FILES[@]}"; do
+  case "$f" in
+    docs/*) : ;; # allowed location for legitimate shipped binary assets
+    *.docx|*.pdf|*.png|*.jpg|*.jpeg|*.gif|*.heic|*.webp)
+      echo "🔴 BLOCKED: $f is a generated document or image outside docs/. These often carry"
+      echo "   real content a text scrub can't see (a resume, a screenshot of an offer"
+      echo "   letter) and are never committed outside docs/."
+      FAIL=1
+      ;;
+  esac
+done
+
+# ---- Generic binary catch-all: any staged file git itself considers binary, outside ----
+# ---- docs/, regardless of extension (a .zip, a .tiff, anything the list above missed). ----
+for f in "${STAGED_FILES[@]}"; do
+  case "$f" in
+    docs/*) continue ;;
+  esac
+  # `git diff --numstat` prints "-\t-\t<path>" for a binary file, "<add>\t<del>\t<path>"
+  # for text. We only need the first field.
+  FIRST_FIELD=$(git diff --cached --numstat --no-renames -- "$f" 2>/dev/null | awk 'NR==1{print $1}')
+  if [ "$FIRST_FIELD" = "-" ]; then
+    echo "🔴 BLOCKED: $f is a binary file outside docs/ (caught by content-type check, not"
+    echo "   just extension). Binary files are never committed outside docs/."
     FAIL=1
   fi
-fi
+done
+
+# ---- Content scrub: currency ranges, phone numbers, personal email, LinkedIn URLs. ----
+# Scans the full STAGED content of each text file (not just the diff) so real data already
+# resident in a file being touched for an unrelated reason is still caught. Mechanical and
+# intentionally broad — false positives cost a re-commit; false negatives cost a public
+# disclosure. Only file:line + category are ever printed — never the matched text itself.
+declare -a SCRUB_NAMES=(
+  "currency range (e.g. a \$NNNK-\$NNNK style band)"
+  "exact currency figure (e.g. a \$N,NNN,NNN style figure)"
+  "phone number"
+  "personal email (gmail/yahoo/hotmail/outlook/icloud)"
+  "LinkedIn profile URL"
+)
+declare -a SCRUB_PATTERNS=(
+  '\$[0-9]{2,3}(,[0-9]{3})?[Kk]?[ -]?[-–—][ -]?\$?[0-9]{2,3}(,[0-9]{3})?[Kk]?'
+  '\$[0-9]{3},[0-9]{3}'
+  '[0-9]{3}-[0-9]{3}-[0-9]{4}'
+  '[a-zA-Z0-9._%+-]+@(gmail|yahoo|hotmail|outlook|icloud)\.com'
+  'linkedin\.com/in/[a-zA-Z0-9-]+'
+)
+
+for f in "${STAGED_FILES[@]}"; do
+  case "$f" in
+    *.docx|*.pdf|*.png|*.jpg|*.jpeg|*.gif|*.heic|*.webp) continue ;; # handled above; binary
+  esac
+  CONTENT=$(git show ":0:$f" 2>/dev/null || true)
+  [ -z "$CONTENT" ] && continue
+
+  idx=0
+  while [ "$idx" -lt "${#SCRUB_PATTERNS[@]}" ]; do
+    pat="${SCRUB_PATTERNS[$idx]}"
+    name="${SCRUB_NAMES[$idx]}"
+    # Print only the line NUMBER of any match, never the match text.
+    LINES=$(printf '%s\n' "$CONTENT" | grep -noE "$pat" | cut -d: -f1 || true)
+    if [ -n "$LINES" ]; then
+      for ln in $LINES; do
+        echo "🔴 BLOCKED: $f:$ln matches the scrub list — $name."
+      done
+      FAIL=1
+    fi
+    idx=$((idx + 1))
+  done
+done
 
 if [ "$FAIL" -eq 1 ]; then
+  echo
+  echo "   This repo ships zero personal values — see JOBS-ADR-003 D1 / JOBS-ADR-004 D2."
+  echo "   If a hit above is a false positive (e.g. a documentation example), rewrite it to"
+  echo "   use an obviously fake placeholder (\$XXX,XXX, name@example.com) instead."
   echo
   echo "Commit blocked by hooks/pre-commit. Fix the above and re-commit."
   exit 1

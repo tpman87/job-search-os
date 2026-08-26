@@ -28,7 +28,7 @@ of them happened once, cost something, and got written down so it wouldn't happe
 ## Quick start
 
 ```bash
-git clone <this-repo> my-job-search
+git clone https://github.com/tpman87/job-search-os.git my-job-search
 cd my-job-search
 bash scripts/setup.sh   # installs the safety hook — do this before anything else
 ```
@@ -44,6 +44,7 @@ Then open Claude Code and run `/onboard`. Full walkthrough: **[GETTING-STARTED.m
 | `docs/CONFIDENTIALITY.md` | What's protected mechanically vs. what's on you |
 | `profile/` | Your data — gitignored, hook-guarded, ships only as `*.template.md` |
 | `roles/` `pipeline/` | Your pipeline — same protection |
+| `applications/` | Generated packets per role (resume, cover letter, QC report) — same protection |
 | `.claude/skills/` | `/onboard` `/evaluate-role` `/sweep` `/tailor` `/cover-letter` `/retrospective` |
 | `.claude/agents/packet-qc.md` | Independent QC, mandatory before any resume/letter ships |
 | `generators/` | Self-contained docx rendering — `npm install` here only, never global |

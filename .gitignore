@@ -14,10 +14,26 @@ roles/passed/*.md
 !roles/_TEMPLATE.md
 pipeline/*.md
 !pipeline/*.template.md
-generated/
+applications/*
+!applications/README.md
 *.docx
 *.pdf
 !docs/**/*.pdf
+
+# ---- USER DATA — binary/image files can carry real content a text scrub can't see ----
+# (a screenshot of an offer letter, a comp email) — never committed outside docs/.
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.heic
+*.webp
+!docs/**/*.png
+!docs/**/*.jpg
+!docs/**/*.jpeg
+!docs/**/*.gif
+!docs/**/*.heic
+!docs/**/*.webp
 
 # ---- OS / editor cruft ----
 .DS_Store

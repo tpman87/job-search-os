@@ -1,0 +1,66 @@
+name: CI
+
+# JOBS-ADR-004 D15. Deliberately `pull_request`, never `pull_request_target` — the latter
+# checks out and can expose repo secrets to a fork's code, which is the classic supply-chain
+# mistake for a public template repo that accepts outside PRs. No job here needs secrets.
+on:
+  pull_request:
+  push:
+    branches: [main, publish]
+
+permissions:
+  contents: read
+
+jobs:
+  hook-selftest:
+    name: Pre-commit hook self-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure a throwaway git identity
+        # scripts/setup.sh's RED check does one real `git commit` that's expected to be
+        # BLOCKED by the hook before git ever needs an author identity — but if the hook
+        # ever regresses and lets the commit through, a missing identity would fail the
+        # commit for an unrelated reason and make the self-test's own diagnosis ambiguous.
+        # Configuring identity removes that confound so a failure here means the hook.
+        run: |
+          git config user.email "ci@example.com"
+          git config user.name "CI"
+      - name: Install and self-test the pre-commit hook
+        run: bash scripts/setup.sh
+
+  syntax:
+    name: Syntax checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+      - name: bash -n on shell scripts
+        run: |
+          bash -n hooks/pre-commit
+          bash -n scripts/setup.sh
+      - name: node --check on generator scripts
+        run: |
+          for f in generators/*.js generators/lib/*.js generators/test/*.js; do
+            node --check "$f"
+          done
+
+  generators:
+    name: Generator regression tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+      - name: npm ci
+        working-directory: generators
+        run: npm ci
+      - name: npm audit (high+ only)
+        working-directory: generators
+        run: npm audit --audit-level=high
+      - name: Run regression tests (synthetic fixtures only — never real data)
+        working-directory: generators
+        run: node test/run-tests.js

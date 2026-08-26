@@ -126,3 +126,7 @@ See `docs/LESSONS.md` for the specific failure patterns this guards against and 
 happen. The short version: claims need a source in `profile/fact-base.md` or
 `profile/portfolio.md`, no exceptions, and the writing skills refuse to draft against an
 empty fact base rather than produce something plausible-sounding and unsupported.
+
+Every generated packet — the tailored resume, the cover letter, and the QC report run
+against both — lives in `applications/<role-id>/`. See `applications/README.md` for the
+naming rule; like `profile/` and `roles/`, nothing under it is ever committed.

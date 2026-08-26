@@ -53,5 +53,9 @@ reliably misses. Don't skip this because the draft "looks fine."
 
 ## Step 6 — save and report
 
-Save to the appropriate location and tell the user what changed relative to their base
-resume/fact base, and why, so the tailoring is auditable.
+Save the source as `applications/<role-id>/resume.md` — see `applications/README.md` for
+the `<role-id>` naming rule (roughly `<company>-<role-slug>[-<req-id>]`). Create the
+directory if it doesn't exist yet. If `generators/` is set up, also run
+`node generate-resume.js` from inside `applications/<role-id>/` to produce `resume.docx`
+alongside it. Tell the user what changed relative to their base resume/fact base, and why,
+so the tailoring is auditable.

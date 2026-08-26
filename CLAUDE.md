@@ -18,7 +18,7 @@ deployment's operational details (which remote/account this instance publishes t
 account-switching needed before a push). Its absence is normal for a fresh clone.
 
 ## FIRST THING, EVERY SESSION — verify the safety hook is installed
-Before writing anything to `profile/`, `pipeline/`, or `roles/`, confirm
+Before writing anything to `profile/`, `pipeline/`, `roles/`, or `applications/`, confirm
 `.git/hooks/pre-commit` exists and is executable (`git` does not install this on clone —
 see `hooks/pre-commit` and `scripts/setup.sh`). If it's missing, **stop and tell the user
 to run `bash scripts/setup.sh` first**, and don't proceed with anything that writes real
@@ -66,6 +66,9 @@ roles/
   _TEMPLATE.md               — the assessment format (tracked — this is structure, not data)
 pipeline/
   BACKLOG.template.md · SOURCING-LOG.template.md · LEARNED.template.md
+applications/
+  <role-id>/                — generated packets (resume, letter, QC report) — gitignored,
+                               real data. See applications/README.md for the naming rule.
 .claude/
   skills/onboard/            — the front door; guided, resumable intake
   skills/evaluate-role/      — research-backed verdict against YOUR profile
@@ -74,7 +77,7 @@ pipeline/
   skills/cover-letter/         — cover letters, refuses without a fact base
   skills/retrospective/        — the LEARNED.md loop; captures corrections so they stick
   agents/packet-qc.md          — independent QC, mandatory before any packet ships
-generators/                 — self-contained docx rendering (npm install here only, never global)
+generators/                 — self-contained docx rendering (npm ci here only, never global)
 hooks/pre-commit            — the scrub gate; installed by scripts/setup.sh
 ```
 
@@ -103,7 +106,10 @@ hooks/pre-commit            — the scrub gate; installed by scripts/setup.sh
   Stage 4 interrogation.
 
 ## THIS REPO'S OWN CONFIDENTIALITY
-See `docs/CONFIDENTIALITY.md`. Short version: `profile/`, `pipeline/`, and `roles/active/`
-+ `roles/passed/` hold your real data and are gitignored + hook-guarded, but the guard
-covers what git can see — it can't stop you from pasting real content into a GitHub issue
-or handing it to another tool connected to the same Claude Code session. Read that file.
+See `docs/CONFIDENTIALITY.md`. Short version: `profile/`, `pipeline/`, `roles/active/` +
+`roles/passed/`, and `applications/` hold your real data and are gitignored +
+hook-guarded — but that guard covers git specifically. It can't stop you from pasting real
+content into a GitHub issue, handing it to another tool connected to the same session, or
+change what's inherent to running this inside an AI assistant in the first place (your
+prompts are processed by that assistant's own servers, same as any AI-assisted work — see
+CONFIDENTIALITY.md's opening section). Read that file.

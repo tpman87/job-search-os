@@ -4,8 +4,12 @@
 
 **If you got here via GitHub's "Use this template" button, set your copy to Private
 before you go any further.** Public is sometimes the default on that flow; check it
-explicitly. Your real data will live in `profile/` and `pipeline/` in your own copy of
-this repo — see `docs/CONFIDENTIALITY.md` for exactly what's protected and what isn't.
+explicitly. This is defense-in-depth, not the reason your data is safe — your real data is
+already gitignored and hook-blocked from ever being committed at all, private repo or not.
+Setting it Private is one more layer against a mistake in that mechanism, not permission to
+commit real data because the repo is private. Your real data will live in `profile/` and
+`pipeline/` in your own copy of this repo — see `docs/CONFIDENTIALITY.md` for exactly
+what's protected, what isn't, and what's inherent to running this inside an AI assistant.
 
 ## Step 1 — install the safety hook
 
@@ -66,11 +70,11 @@ rather than a bare pass/fail.
 
 ```bash
 cd generators
-npm install
-node generate-resume.js ../career/tailored/some-role.md
+npm ci
+node generate-resume.js ../applications/some-company-role/resume.md
 ```
 
-If `npm install` fails (common on a locked-down corporate machine), you don't need this —
+If `npm ci` fails (common on a locked-down corporate machine), you don't need this —
 the markdown source files `/tailor` and `/cover-letter` write are fully usable on their
 own; copy the text into any document editor. See `generators/README.md`.
 
