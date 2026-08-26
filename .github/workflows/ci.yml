@@ -41,11 +41,23 @@ jobs:
         run: |
           bash -n hooks/pre-commit
           bash -n scripts/setup.sh
+          bash -n scripts/check-preflight.sh
       - name: node --check on generator scripts
         run: |
           for f in generators/*.js generators/lib/*.js generators/test/*.js; do
             node --check "$f"
           done
+
+  preflight-coverage:
+    name: Preflight coverage check
+    # JOBS-ADR-004 D12: asserts every .claude/skills/*/SKILL.md declares the
+    # pipeline/LEARNED.md preflight — see scripts/check-preflight.sh for why this needs to
+    # be a mechanism and not a convention.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check every skill declares the LEARNED.md preflight
+        run: bash scripts/check-preflight.sh
 
   generators:
     name: Generator regression tests

@@ -22,3 +22,31 @@ who'd lived through every correction. One file, one habit, prevents that.
 **How this should change future behavior:** <the rule, stated plainly>
 
 -->
+
+---
+
+## Outcomes
+<!-- JOBS-ADR-004 D11 (halved from the original design — no trade-off/confidence/
+     desired-level scoring apparatus; that was cut as formalized rigor with no real reader.
+     What's kept is plain outcome capture, because it's the one thing that actually feeds
+     a pattern /retrospective can find later.
+
+     Append one entry here whenever a role reaches a terminal state (Rejected / Withdrawn /
+     Retired-silent — see roles/_TEMPLATE.md's Status field). /retrospective reads this
+     section looking for real patterns: which sourcing channels convert, which packet
+     framing gets a response, which company signals predicted the outcome. It is a log, not
+     a scored decision record — resist the urge to add a numeric field back in here. -->
+
+<!-- New entries go at the top. Format:
+
+### YYYY-MM-DD — <Company> — <role-id or company-slug>
+**Outcome:** <Rejected / Withdrawn / Retired-silent (non-response)>
+**Did they respond at all?** <yes/no, and how — screen scheduled, form rejection, silence>
+**Got to a screen/interview?** <yes/no, how far>
+**Source channel:** <cold ATS application / referral / recruiter outreach / sweep result>
+**Packet version:** <link or note on which resume/letter version was sent, if it changed
+  across a long pipeline>
+**Stated reason (if any):** <verbatim if they gave one, else "none given">
+
+-->
+

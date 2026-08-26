@@ -34,6 +34,8 @@ bash scripts/setup.sh   # installs the safety hook — do this before anything e
 ```
 
 Then open Claude Code and run `/onboard`. Full walkthrough: **[GETTING-STARTED.md](GETTING-STARTED.md)**.
+Want to see the shape of the output before committing an hour to onboarding? See the fully
+fictional, end-to-end walkthrough in **[docs/DEMO.md](docs/DEMO.md)**.
 
 ## What's in here
 
@@ -41,6 +43,7 @@ Then open Claude Code and run `/onboard`. Full walkthrough: **[GETTING-STARTED.m
 |---|---|
 | `docs/METHOD.md` | The full method, human-readable, works with any tool or none |
 | `docs/LESSONS.md` | Learned rules, each tied to a real (fictionalized) failure |
+| `docs/DEMO.md` | A fully synthetic, start-to-finish walkthrough of every stage |
 | `docs/CONFIDENTIALITY.md` | What's protected mechanically vs. what's on you |
 | `profile/` | Your data — gitignored, hook-guarded, ships only as `*.template.md` |
 | `roles/` `pipeline/` | Your pipeline — same protection |

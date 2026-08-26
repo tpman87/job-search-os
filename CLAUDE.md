@@ -59,6 +59,7 @@ GETTING-STARTED.md         — first-session walkthrough
 docs/
   METHOD.md                — the full method, tool-agnostic, readable standalone
   LESSONS.md                — learned rules, each with a real (fictionalized) origin story
+  DEMO.md                   — a fully synthetic, start-to-finish walkthrough of every stage
   CONFIDENTIALITY.md        — what's enforced for you vs. what you have to watch yourself
 profile/                   — YOUR DATA. Gitignored except *.template.md. See CONFIDENTIALITY.md.
 roles/
@@ -84,7 +85,9 @@ hooks/pre-commit            — the scrub gate; installed by scripts/setup.sh
 ## CORE WORKFLOW
 1. First run: `bash scripts/setup.sh`, then `/onboard`.
 2. Paste a JD (or a link/company name): `/evaluate-role`.
-3. Saved to `roles/active/<company-slug>.md` (or `roles/passed/` on a Pass).
+3. Saved to `roles/active/<role-id>.md` (or `roles/passed/` on a Pass) — see
+   `applications/README.md` for the `<role-id>` naming rule. The verbatim JD, req ID, and
+   source URL are captured in the role file itself (JOBS-ADR-004 D6).
 4. On a Pursue: `/tailor` and `/cover-letter`, then `packet-qc` runs automatically before
    either is presented as ready to send.
 5. Correct the tool when it gets something wrong — `/retrospective` captures it into
@@ -97,8 +100,14 @@ hooks/pre-commit            — the scrub gate; installed by scripts/setup.sh
   says it is. Score every dimension on its own evidence.
 - **Never infer compensation from a title, seniority language, or reporting line.**
   Research it, or leave it unresolved — see `docs/LESSONS.md` lesson 2.
-- **A non-response is a rejection after about two weeks; no follow-up is sent.** Pipeline
-  hygiene, not a judgment about the role.
+- **A non-response is a rejection after about two weeks — for a cold application, with no
+  follow-up sent.** A referral, an active recruiter thread, or a completed interview
+  carves out an exception, and even then the clock resets rather than stopping for good —
+  see `pipeline/BACKLOG.template.md`. Pipeline hygiene, not a judgment about the role.
+- **Track explicit lifecycle state per role** (Shortlisted → Applied → Recruiter Screen →
+  Interview → Offer / Rejected / Withdrawn / Retired-silent / On Hold), and capture the
+  outcome into `pipeline/LEARNED.md` when a role closes — see `docs/METHOD.md`'s Pipeline
+  hygiene section.
 - **Every claim in a resume or letter traces to `profile/fact-base.md` or
   `profile/portfolio.md`.** No exceptions for plausibility.
 - **The friction beat in a cover letter needs a real, interrogated documented failure** —

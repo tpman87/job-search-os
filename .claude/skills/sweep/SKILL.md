@@ -6,6 +6,9 @@ tools: Read, Write, Edit, WebSearch, WebFetch, Glob
 
 # Sweep
 
+**Preflight (JOBS-ADR-004 D12):** read `pipeline/LEARNED.md` first, if it exists — skip if
+absent. Treat every entry there as binding, exactly like a rule in `constraints.md`.
+
 See `docs/METHOD.md` §Sourcing and `docs/LESSONS.md` lesson 5 for why this searches by
 vocabulary instead of industry — the short version: a role type that shows up in adjacent
 industries gets systematically missed by an industry-first search, and vocabulary-matching
