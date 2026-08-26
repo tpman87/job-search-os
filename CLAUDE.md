@@ -11,6 +11,12 @@ and never claim more than your fact base actually supports.
 lives in `profile/` and `pipeline/`, which are gitignored — see `docs/CONFIDENTIALITY.md`
 before you type anything real into either.
 
+## FIRST THING, EVERY SESSION — check for OPERATIONS.md
+If `OPERATIONS.md` exists in this repo root, **read it before doing anything else.** It's
+gitignored and never ships in the public template — when present, it holds this specific
+deployment's operational details (which remote/account this instance publishes to, any
+account-switching needed before a push). Its absence is normal for a fresh clone.
+
 ## FIRST THING, EVERY SESSION — verify the safety hook is installed
 Before writing anything to `profile/`, `pipeline/`, or `roles/`, confirm
 `.git/hooks/pre-commit` exists and is executable (`git` does not install this on clone —

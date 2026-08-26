@@ -36,3 +36,7 @@ npm-debug.log*
 
 # generators/node_modules is per-machine (npm install), never committed
 generators/node_modules/
+
+# OPERATIONS.md holds Tim's own deployment details (which GitHub account/repo this
+# instance publishes to) — never ships in the public template, same reasoning as profile/.
+OPERATIONS.md
