@@ -1,0 +1,38 @@
+# === job-search-os — .gitignore ===
+# Per JOBS-ADR-003 D1: this repo is a template engine, the person is the data.
+# profile/ holds real user data in any working instance and must NEVER be committed —
+# only the *.template.md files ship. This is belt-and-suspenders with the pre-commit
+# scrub hook (hooks/pre-commit) and the categorical refusal in D1b.
+
+# ---- USER DATA — never committed ----
+profile/*.md
+!profile/*.template.md
+roles/active/*.md
+roles/passed/*.md
+!roles/active/.gitkeep
+!roles/passed/.gitkeep
+!roles/_TEMPLATE.md
+pipeline/*.md
+!pipeline/*.template.md
+generated/
+*.docx
+*.pdf
+!docs/**/*.pdf
+
+# ---- OS / editor cruft ----
+.DS_Store
+*.swp
+.vscode/
+
+# ---- Node (generators/ is self-contained, D8) ----
+node_modules/
+npm-debug.log*
+
+# ---- Never, under any circumstances ----
+.env*
+**/secrets/**
+*.pem
+*.key
+
+# generators/node_modules is per-machine (npm install), never committed
+generators/node_modules/
