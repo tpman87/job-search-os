@@ -109,13 +109,28 @@ Step 3, applied at scale across a sweep instead of one role at a time.
 
 ## Pipeline hygiene
 
-- **A non-response is a rejection after about two weeks.** Move it to your "passed" list
-  with a dated note, and don't chase it with a follow-up — chasing a silent employer rarely
-  changes the outcome and mostly costs you attention better spent elsewhere. Nothing is
-  deleted; a late callback flips the role back to active at zero cost.
+- **A non-response is a rejection after about two weeks — with carve-outs.** The default
+  applies to a cold application with no human contact: move it to your "passed" list with a
+  dated note, and don't chase it with a follow-up. But a referral/warm contact, an active
+  recruiter thread, or a completed interview changes what silence means, so the clock
+  doesn't apply the same way once one of those is true. It also doesn't stop entirely: it
+  **resets** from whichever is more recent of your last actual human contact or a date the
+  employer themselves gave you — a carve-out is a reason the clock restarted, not a reason
+  it stopped forever. See `pipeline/BACKLOG.template.md` for the full rule. Nothing is
+  deleted either way; a late callback flips a role back to active at zero cost.
+- **Track lifecycle state explicitly**, not just "active" vs. "passed": Shortlisted →
+  Applied → Recruiter Screen → Interview → Offer / Rejected / Withdrawn / Retired-silent,
+  plus On Hold for a hiring freeze (freezes are real and shouldn't read as a rejection).
+  The three terminal states are explicitly reversible — see `roles/_TEMPLATE.md`'s Status
+  field and Application Tracking section.
 - **Never delete a passed-on role.** The reasons you passed are pattern memory — re-reading
   them before evaluating a similar role sharpens the next verdict the same way avoiding a
   repeated mistake does.
+- **When a role reaches a terminal state, capture the outcome** — did they respond, did you
+  screen, what channel sourced it, which packet version, the stated reason if any — into
+  `pipeline/LEARNED.md`'s outcomes section. This is what lets `/retrospective` find real
+  patterns (which channels actually convert, which packet framing gets a response) instead
+  of relying on impression.
 - Run the non-response check at the start of every session, not just when you remember to.
   A pipeline that only gets cleaned occasionally accumulates dead "awaiting response" rows
   that make your active count look bigger than it really is.

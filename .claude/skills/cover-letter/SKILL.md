@@ -6,6 +6,9 @@ tools: Read, Write, Edit, Glob
 
 # Cover Letter
 
+**Preflight (JOBS-ADR-004 D12):** read `pipeline/LEARNED.md` first, if it exists — skip if
+absent. Treat every entry there as binding, exactly like a rule in `constraints.md`.
+
 A cover letter drafted by an AI system under structural pressure to sound personal and
 specific will invent details when the real ones aren't on hand — see `docs/LESSONS.md`
 lessons 6-8 for exactly how this happens and why it's convincing when it does. This skill

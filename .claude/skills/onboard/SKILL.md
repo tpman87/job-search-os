@@ -6,6 +6,9 @@ tools: Read, Write, Edit, Glob
 
 # Onboard
 
+**Preflight (JOBS-ADR-004 D12):** read `pipeline/LEARNED.md` first, if it exists — skip if
+absent. Treat every entry there as binding, exactly like a rule in `constraints.md`.
+
 Build the user's `profile/` from a real conversation, not a form. This is the front door
 of the whole tool — a shallow run here produces shallow verdicts and generic writing
 later, silently, because nothing downstream can tell the difference between "the role is

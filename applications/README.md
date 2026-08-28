@@ -51,6 +51,8 @@ Examples:
 - `acme-director-cloud-platform-2/` (second similar role at the same company, no req-id
   to disambiguate)
 
-This same rule is reused by `roles/active/` and `roles/passed/` filenames once JOBS-ADR-004
-D6 lands (tracked separately — that phase also adds verbatim JD preservation to the role
-file itself, not just the application packet).
+This same rule is reused by `roles/active/` and `roles/passed/` filenames per JOBS-ADR-004
+D6, which also adds verbatim JD preservation (full posting text, req ID, source URL,
+retrieval date) to the role file itself, not just the application packet. See
+`roles/_TEMPLATE.md`. Pre-D6 role files keep their old `<company-slug>.md` names — this
+repo never renames an existing file on your behalf.

@@ -6,6 +6,9 @@ tools: Read, Write, Edit, WebSearch, WebFetch, Glob
 
 # Evaluate Role
 
+**Preflight (JOBS-ADR-004 D12):** read `pipeline/LEARNED.md` first, if it exists — skip if
+absent. Treat every entry there as binding, exactly like a rule in `constraints.md`.
+
 Produce a decisive, research-backed assessment of a job opportunity against the user's own
 profile — never against a generic notion of a "good role." **Lead with the verdict. Be
 direct. Don't hedge** — except in exactly the one place hedging is correct (see Step 0).
@@ -98,10 +101,27 @@ stage. **Explicitly flag** if it likely misses the floor in `constraints.md`.
 
 ## Step 5 — write the assessment
 
+**Before creating a new file, check for an existing one on this company** (JOBS-ADR-004
+D6): glob `roles/active/*.md` and `roles/passed/*.md` for a file whose company name
+matches, under EITHER naming shape — an old `<company-slug>.md` file from before this rule
+existed, or a current `<role-id>.md` file. A match under either shape means this is an
+update to an existing evaluation, not a new one: ask the user whether to update that file
+in place or, if it's genuinely a different role at the same company, proceed with a new
+file. Never silently create a second file for a company already tracked. This repo never
+migrates an old file's name just because you touched it (see README.md's one-time-handoff
+stance) — leave a pre-existing `<company-slug>.md` exactly as named.
+
 Output in the format in `roles/_TEMPLATE.md`, then save it:
-- Copy `roles/_TEMPLATE.md` → `roles/active/<company-slug>.md` (or `roles/passed/` on a
-  Pass), filled in — including the provisional-verdict banner content if one was shown, so
-  the file stays honest about the confidence it was written under.
+- Copy `roles/_TEMPLATE.md` → `roles/active/<role-id>.md` (or `roles/passed/` on a Pass) —
+  see `applications/README.md` for the `<role-id>` naming rule
+  (`<company>-<role-slug>[-<req-id>]`), filled in — including the provisional-verdict
+  banner content if one was shown, so the file stays honest about the confidence it was
+  written under.
+- **Capture the verbatim JD** (JOBS-ADR-004 D6): paste the full posting text, unedited,
+  into the "Verbatim Job Description" section, and fill in Req ID, Source URL, Retrieved
+  date, and Closing date (if the posting states one). This is provenance — a posting can be
+  edited or pulled later, and this is the only record of what it said when you evaluated
+  it. Do not paraphrase or summarize it in that section; save summarizing for the scorecard.
 - Update `pipeline/BACKLOG.md` with the role's status and open due-diligence items.
 - Confirm the saved path to the user.
 
